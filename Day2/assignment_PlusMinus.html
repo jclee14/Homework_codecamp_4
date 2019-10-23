@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<head>
+    <title>Plus&Minus Assignment</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <!-- By Supawit Charoenwetch -->
+    <div id="result">0</div>
+    <button onclick="add()">Plus</button>
+    <button onclick="minus()">Minus</button>
+    <script>
+            let resultContainer = document.getElementById("result");
+            function add() {
+                let result = parseInt(resultContainer.innerHTML);
+                resultContainer.innerHTML = result + 1;
+            }
+            function minus() {
+                let result = parseInt(resultContainer.innerHTML);
+                resultContainer.innerHTML = result - 1;
+            }
+    </script>
+</body>
+</html>
