@@ -1,0 +1,31 @@
+.form-btn {
+  width: 100%;
+}
+
+.form-input {
+  margin-bottom: 0;
+}
+
+.txt-date {
+  color: grey;
+  font-size: 90%;
+  font-style: italic;
+}
+
+ul {
+  overflow: auto;
+  height: 300px;
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  list-style: none;
+  padding: 10px 20px;
+}
+
+#empty-notice {
+  font-size: 25px;
+  color: grey;
+  margin-top: 20px;
+}
