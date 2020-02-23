@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { addNote, increaseId } from '../redux/actions/actions';
 import './NoteForm_List.css';
-import { Form, Button, Input, Icon, Select, DatePicker } from 'antd';
+import { Form, Button, Input, Icon, Select, DatePicker, Modal, Divider } from 'antd';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -20,6 +20,9 @@ class NoteForm extends React.Component {
       title: '',
       content: '',
       tag: '',
+      tagItems: ['TAG_GENERAL', 'TAG_IMPORTANT', 'TAG_OTHER'],
+      tagModalVisible: false,
+      newTagInput: '',
     }
   }
 
@@ -33,6 +36,36 @@ class NoteForm extends React.Component {
 
   handleSelectChange = (value) => {
     this.setState({ tag: value });
+  };
+
+  showModal = () => {
+    console.log('showmodal');
+    this.setState({
+      tagModalVisible: true,
+    });
+  };
+
+  handleNewTagInput = (event) => {
+    this.setState({
+      newTagInput: event.target.value
+    })
+  }
+
+  handleAddTag = () => {
+    this.handleModalCancel();
+    
+    this.setState(prevState => ({
+      ...prevState,
+      tagItems: [...prevState.tagItems, prevState.newTagInput],
+      newTagInput: '',
+    }));
+  };
+
+  handleModalCancel = e => {
+    console.log(e);
+    this.setState({
+      tagModalVisible: false,
+    });
   };
 
   handleSubmit = (e) => {
@@ -72,7 +105,9 @@ class NoteForm extends React.Component {
 
   render() {
     const { getFieldDecorator } = this.props.form;
+    const { tagItems } = this.state;
     return (
+      <div>
       <Form onSubmit={this.handleSubmit}>
         <Form.Item label="Title" className="form-input">
           {getFieldDecorator('title', {
@@ -119,6 +154,34 @@ class NoteForm extends React.Component {
             rules: [{ required: true, message: 'Please select your tag!' }],
           })(
             <Select
+              placeholder="custom dropdown render"
+              onChange={this.handleSelectChange}
+              dropdownRender={menu => (
+                <div>
+                  {menu}
+                  <Divider style={{ margin: '4px 0' }} />
+                  <div
+                    style={{ padding: '4px 8px', cursor: 'pointer' }}
+                    onMouseDown={e => e.preventDefault()}
+                    onClick={this.showModal}
+                  >
+                    <Icon type="edit" /> Edit Tags
+                  </div>
+                </div>
+              )}
+            >
+              {tagItems.map(item => (
+                <Option key={item}>{item}</Option>
+              ))}
+            </Select>,
+          )}
+        </Form.Item>
+
+{/*         <Form.Item label="Tag">
+          {getFieldDecorator('tag', {
+            rules: [{ required: true, message: 'Please select your tag!' }],
+          })(
+            <Select
               placeholder="Select your note tag here"
               onChange={this.handleSelectChange}
             >
@@ -127,7 +190,7 @@ class NoteForm extends React.Component {
               <Option value="TAG_OTHER">other</Option>
             </Select>,
           )}
-        </Form.Item>
+        </Form.Item> */}
 
         <Form.Item>
           <Button type="primary" htmlType="submit" className="form-btn">
@@ -135,6 +198,34 @@ class NoteForm extends React.Component {
           </Button>
         </Form.Item>
       </Form>
+      <Modal
+          title="Basic Modal"
+          visible={this.state.tagModalVisible}
+/*           onOk={this.handleModalOk} */
+          onCancel={this.handleModalCancel}
+          footer={[
+            <Button type="danger" onClick={this.handleModalCancel}>
+              Cancel
+            </Button>,
+            <Button type="primary" onClick={this.handleAddTag}>
+              Add
+            </Button>
+          ]}
+        >
+          <Input
+            onChange={ this.handleNewTagInput }
+            placeholder="Enter New Tag Here"
+          />
+          <Select
+              placeholder="Select your note tag here"
+              onChange={this.handleSelectChange}
+            >
+              <Option value="TAG_GENERAL">general</Option>
+              <Option value="TAG_IMPORTANT">important</Option>
+              <Option value="TAG_OTHER">other</Option>
+          </Select>
+      </Modal>
+      </div>
     )
   }
 }

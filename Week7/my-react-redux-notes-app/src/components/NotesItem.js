@@ -19,7 +19,7 @@ class NotesItem extends React.Component {
       return (
           <Row style={{ marginTop: "20px" }}>
             <Col>
-              <ul>
+              <ul id="note-list-ul">
                 {filteredNotes.map((note, index) => (
                   <li key={note.id} style={{ backgroundColor: index % 2 === 0 ? "#f7f7f7" : "white" }}>
                     <Row>

@@ -31,7 +31,7 @@ class NotesList extends React.Component {
           <br />
           <Row type="flex" justify="center">
             <Col>
-              <ButtonGroup style={{ witdh: "100%" }}>
+              <ButtonGroup className="tag-btn-group" style={{ witdh: "100%" }}>
                 <Button type={tagFilter === TAG_ALL ? "primary" : "dashed"} onClick={ () => this.props.showAllTag()} >
                   All Tags
                 </Button>
