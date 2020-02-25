@@ -10,6 +10,9 @@ export const SHOW_INACTIVE = 'SHOW_INACTIVE';
 
 export const ID_INCREASE = 'ID_INCREASE';
 
+export const ADD_TAG = 'ADD_TAG';
+export const REMOVE_TAG = 'REMOVE_TAG';
+
 export const SHOW_TAG_ALL = 'SHOW_TAG_ALL'
 export const SHOW_TAG_GENERAL = 'SHOW_TAG_GENERAL'
 export const SHOW_TAG_IMPORTANT = 'SHOW_TAG_IMPORTANT'
@@ -46,6 +49,20 @@ export function showInActive() {
 
 export function increaseId() {
   return { type: ID_INCREASE }
+}
+
+export function addTag(tagName) {
+  return {
+    type: ADD_TAG,
+    tagName: tagName,
+  }
+}
+
+export function removeTag(tagName) {
+  return {
+    type: REMOVE_TAG,
+    tagName: tagName,
+  }
 }
 
 export function showAllTag() {

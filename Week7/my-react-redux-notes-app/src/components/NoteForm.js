@@ -21,8 +21,10 @@ class NoteForm extends React.Component {
       content: '',
       tag: '',
       tagItems: ['TAG_GENERAL', 'TAG_IMPORTANT', 'TAG_OTHER'],
-      tagModalVisible: false,
+      addTagModalVisible: false,
+      removeTagModalVisible: false,
       newTagInput: '',
+      removedTagSelect: '',
     }
   }
 
@@ -38,11 +40,16 @@ class NoteForm extends React.Component {
     this.setState({ tag: value });
   };
 
-  showModal = () => {
-    console.log('showmodal');
-    this.setState({
-      tagModalVisible: true,
-    });
+  showEditModal = (isAddTag) => {
+    if(isAddTag) {
+      this.setState({
+        addTagModalVisible: true,
+      });
+    } else {
+      this.setState({
+        removeTagModalVisible: true,
+      });
+    }
   };
 
   handleNewTagInput = (event) => {
@@ -51,20 +58,45 @@ class NoteForm extends React.Component {
     })
   }
 
+  handleSelectRemoveTag = (value) => {
+    this.setState({ removedTagSelect: value });
+  }
+
   handleAddTag = () => {
     this.handleModalCancel();
-    
-    this.setState(prevState => ({
-      ...prevState,
-      tagItems: [...prevState.tagItems, prevState.newTagInput],
-      newTagInput: '',
-    }));
+  
+    const newTag = this.state.newTagInput;
+    if(newTag) {
+      this.setState(prevState => ({
+        ...prevState,
+        tagItems: [...prevState.tagItems, newTag],
+        newTagInput: '',
+      }));
+    }
   };
 
-  handleModalCancel = e => {
-    console.log(e);
+  handleRemoveTag = () => {
+    this.handleModalCancel();
+
+    const removeTag = this.state.removedTagSelect;
+    if(removeTag) {
+      this.setState(prevState => ({
+        ...prevState,
+        tagItems: prevState.tagItems.filter((tag) => {
+          return tag !== removeTag;
+        }),
+        removedTagSelect: '',
+      }))
+    }
+  };
+
+  handleModalCancel = () => {
     this.setState({
-      tagModalVisible: false,
+      addTagModalVisible: false,
+      removeTagModalVisible: false,
+      newTagInput: '',
+      removedTagSelect: '',
+      tag: '',
     });
   };
 
@@ -108,123 +140,148 @@ class NoteForm extends React.Component {
     const { tagItems } = this.state;
     return (
       <div>
-      <Form onSubmit={this.handleSubmit}>
-        <Form.Item label="Title" className="form-input">
-          {getFieldDecorator('title', {
-              rules: [{ required: true, message: 'Please input your title!' }],
-              onChange: this.handleTitleChange,
-          })(
-              <Input
-                prefix={<Icon type="form" style={{ color: 'rgba(0,0,0,.25)' }} />}
-                placeholder="Title" allowClear
-              />,
-          )}
-        </Form.Item>
+        <Form onSubmit={this.handleSubmit}>
+          <Form.Item label="Title" className="form-input">
+            {getFieldDecorator('title', {
+                rules: [{ required: true, message: 'Please input your title!' }],
+                onChange: this.handleTitleChange,
+            })(
+                <Input
+                  prefix={<Icon type="form" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                  placeholder="Title" allowClear
+                />,
+            )}
+          </Form.Item>
 
-{/*         Title: <br />
-        <input type="text" name="title" onChange={this.handleTitleChange} value={this.state.title} />
-        <br /> */}
+  {/*         Title: <br />
+          <input type="text" name="title" onChange={this.handleTitleChange} value={this.state.title} />
+          <br /> */}
 
-        <Form.Item label="Content" className="form-input">
-          {getFieldDecorator('content', {
-              rules: [{ required: true, message: 'Please input your note content!' }],
-              onChange: this.handleContentChange,
-          })(
-              <TextArea rows={5} allowClear />,
-          )}
-        </Form.Item>
+          <Form.Item label="Content" className="form-input">
+            {getFieldDecorator('content', {
+                rules: [{ required: true, message: 'Please input your note content!' }],
+                onChange: this.handleContentChange,
+            })(
+                <TextArea rows={5} allowClear />,
+            )}
+          </Form.Item>
 
-{/*         <textarea
-          name="content"
-          cols="30"
-          rows="5"
-          onChange={this.handleContentChange}
-          value={this.state.content}
-        />
-        <br /> */}
-
-        <Form.Item label="Due date" className="form-input">
-          {getFieldDecorator('range-time-picker', rangeConfig)(
-            <RangePicker showTime format="YYYY-MM-DD HH:mm:ss" />,
-          )}
-        </Form.Item>
-
-        <Form.Item label="Tag">
-          {getFieldDecorator('tag', {
-            rules: [{ required: true, message: 'Please select your tag!' }],
-          })(
-            <Select
-              placeholder="custom dropdown render"
-              onChange={this.handleSelectChange}
-              dropdownRender={menu => (
-                <div>
-                  {menu}
-                  <Divider style={{ margin: '4px 0' }} />
-                  <div
-                    style={{ padding: '4px 8px', cursor: 'pointer' }}
-                    onMouseDown={e => e.preventDefault()}
-                    onClick={this.showModal}
-                  >
-                    <Icon type="edit" /> Edit Tags
-                  </div>
-                </div>
-              )}
-            >
-              {tagItems.map(item => (
-                <Option key={item}>{item}</Option>
-              ))}
-            </Select>,
-          )}
-        </Form.Item>
-
-{/*         <Form.Item label="Tag">
-          {getFieldDecorator('tag', {
-            rules: [{ required: true, message: 'Please select your tag!' }],
-          })(
-            <Select
-              placeholder="Select your note tag here"
-              onChange={this.handleSelectChange}
-            >
-              <Option value="TAG_GENERAL">general</Option>
-              <Option value="TAG_IMPORTANT">important</Option>
-              <Option value="TAG_OTHER">other</Option>
-            </Select>,
-          )}
-        </Form.Item> */}
-
-        <Form.Item>
-          <Button type="primary" htmlType="submit" className="form-btn">
-            Add Note
-          </Button>
-        </Form.Item>
-      </Form>
-      <Modal
-          title="Basic Modal"
-          visible={this.state.tagModalVisible}
-/*           onOk={this.handleModalOk} */
-          onCancel={this.handleModalCancel}
-          footer={[
-            <Button type="danger" onClick={this.handleModalCancel}>
-              Cancel
-            </Button>,
-            <Button type="primary" onClick={this.handleAddTag}>
-              Add
-            </Button>
-          ]}
-        >
-          <Input
-            onChange={ this.handleNewTagInput }
-            placeholder="Enter New Tag Here"
+  {/*         <textarea
+            name="content"
+            cols="30"
+            rows="5"
+            onChange={this.handleContentChange}
+            value={this.state.content}
           />
-          <Select
-              placeholder="Select your note tag here"
-              onChange={this.handleSelectChange}
-            >
-              <Option value="TAG_GENERAL">general</Option>
-              <Option value="TAG_IMPORTANT">important</Option>
-              <Option value="TAG_OTHER">other</Option>
-          </Select>
-      </Modal>
+          <br /> */}
+
+          <Form.Item label="Due date" className="form-input">
+            {getFieldDecorator('range-time-picker', rangeConfig)(
+              <RangePicker style={{ width: "100%"}} showTime format="YYYY-MM-DD HH:mm:ss" />,
+            )}
+          </Form.Item>
+
+          <Form.Item label="Tag">
+            {getFieldDecorator('tag', {
+              rules: [{ required: true, message: 'Please select your tag!' }],
+            })(
+              <Select
+                placeholder="Select / Edit Tags"
+                onChange={this.handleSelectChange}
+                dropdownRender={menu => (
+                  <div>
+                    {menu}
+                    <Divider style={{ margin: '4px 0' }} />
+                    <div
+                      style={{ padding: '4px 8px', cursor: 'pointer' }}
+                      onMouseDown={e => e.preventDefault()}
+                      onClick={ () => this.showEditModal(true) }
+                    >
+                      <Icon type="plus" /> Add Tags
+                    </div>
+                    <div
+                      style={{ padding: '4px 8px', cursor: 'pointer' }}
+                      onMouseDown={e => e.preventDefault()}
+                      onClick={ () => this.showEditModal(false) }
+                    >
+                      <Icon type="edit" /> Remove Tags
+                    </div>
+                  </div>
+                )}
+              >
+                {tagItems.map(item => (
+                  <Option key={item}>{item}</Option>
+                ))}
+              </Select>,
+            )}
+          </Form.Item>
+
+  {/*         <Form.Item label="Tag">
+            {getFieldDecorator('tag', {
+              rules: [{ required: true, message: 'Please select your tag!' }],
+            })(
+              <Select
+                placeholder="Select your note tag here"
+                onChange={this.handleSelectChange}
+              >
+                <Option value="TAG_GENERAL">general</Option>
+                <Option value="TAG_IMPORTANT">important</Option>
+                <Option value="TAG_OTHER">other</Option>
+              </Select>,
+            )}
+          </Form.Item> */}
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit" className="form-btn">
+              Add Note
+            </Button>
+          </Form.Item>
+        </Form>
+        <Modal
+            title="Create Tag Editor"
+            centered
+            visible={this.state.addTagModalVisible}
+  /*           onOk={this.handleModalOk} */
+            onCancel={this.handleModalCancel}
+            footer={[
+              <Button type="danger" onClick={this.handleModalCancel}>
+                Cancel
+              </Button>,
+              <Button type="primary" onClick={this.handleAddTag}>
+                Create
+              </Button>
+            ]}
+        >
+            <Input
+              onChange={ this.handleNewTagInput }
+              placeholder="Enter New Tag Here"
+            />
+        </Modal>
+        <Modal
+            title="Remove Tag Editor"
+            centered
+            visible={this.state.removeTagModalVisible}
+  /*           onOk={this.handleModalOk} */
+            onCancel={this.handleModalCancel}
+            footer={[
+              <Button type="danger" onClick={this.handleModalCancel}>
+                Cancel
+              </Button>,
+              <Button type="primary" onClick={this.handleRemoveTag}>
+                Remove
+              </Button>
+            ]}
+        >
+            <Select
+                placeholder="Select tag to remove here"
+                onChange={this.handleSelectRemoveTag}
+                style={{ width: "100%" }}
+                >
+                {tagItems.map((item,index) => (
+                  <Option key={item} disabled={index < 3 ? true : false}>{item}</Option>
+                ))}
+            </Select>
+        </Modal>
       </div>
     )
   }
