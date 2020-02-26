@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { addNote, increaseId } from '../redux/actions/actions';
+import { addNote, increaseId, addTag, removeTag } from '../redux/actions/actions';
 import './NoteForm_List.css';
 import { Form, Button, Input, Icon, Select, DatePicker, Modal, Divider } from 'antd';
 
@@ -20,7 +20,6 @@ class NoteForm extends React.Component {
       title: '',
       content: '',
       tag: '',
-      tagItems: ['TAG_GENERAL', 'TAG_IMPORTANT', 'TAG_OTHER'],
       addTagModalVisible: false,
       removeTagModalVisible: false,
       newTagInput: '',
@@ -64,29 +63,37 @@ class NoteForm extends React.Component {
 
   handleAddTag = () => {
     this.handleModalCancel();
-  
-    const newTag = this.state.newTagInput;
-    if(newTag) {
-      this.setState(prevState => ({
+
+    const newTagInput = this.state.newTagInput.toUpperCase();  
+    if(newTagInput) {
+      const newTagName = 'TAG_' + newTagInput[0] + newTagInput.substring(1, newTagInput.length);
+      this.props.addTag(newTagName);
+
+      this.setState({ newTagInput: '' });
+/*       this.setState(prevState => ({
         ...prevState,
         tagItems: [...prevState.tagItems, newTag],
         newTagInput: '',
-      }));
+      })); */
     }
   };
 
   handleRemoveTag = () => {
     this.handleModalCancel();
 
-    const removeTag = this.state.removedTagSelect;
+    const removeTagSelect = this.state.removedTagSelect.toUpperCase();
     if(removeTag) {
-      this.setState(prevState => ({
+      const removeTag = 'TAG_' + removeTagSelect[0] + removeTagSelect.substring(1, removeTagSelect.length);
+      this.props.removeTag(removeTag);
+
+      this.setState({ removedTagSelect: '' });
+/*       this.setState(prevState => ({
         ...prevState,
         tagItems: prevState.tagItems.filter((tag) => {
           return tag !== removeTag;
         }),
         removedTagSelect: '',
-      }))
+      })) */
     }
   };
 
@@ -94,9 +101,6 @@ class NoteForm extends React.Component {
     this.setState({
       addTagModalVisible: false,
       removeTagModalVisible: false,
-      newTagInput: '',
-      removedTagSelect: '',
-      tag: '',
     });
   };
 
@@ -107,7 +111,8 @@ class NoteForm extends React.Component {
       if (!err) {
         let title = this.state.title;
         let content = this.state.content;
-        let tag = this.state.tag;
+        let tag = this.state.tag.toUpperCase();
+        const formalTag = 'TAG_' + tag[0] + tag.substring(1, tag.length);
 
         let localStr = JSON.parse(localStorage.getItem('persist:root'));
         let id = localStr.id;
@@ -126,7 +131,7 @@ class NoteForm extends React.Component {
 
         const dueDate = values['range-time-picker'];
 
-        this.props.addNote(id, title, content, dueDate, tag, createdDate);
+        this.props.addNote(id, title, content, dueDate, formalTag, createdDate);
         this.props.increaseId();
     
         this.setState({ title: '', content: '' });
@@ -137,7 +142,10 @@ class NoteForm extends React.Component {
 
   render() {
     const { getFieldDecorator } = this.props.form;
-    const { tagItems } = this.state;
+    const propsTags = this.props.tags;
+    const tagItems = propsTags.map((tag) => {
+      return tag.substring(4,tag.length).toLowerCase();
+    })
     return (
       <div>
         <Form onSubmit={this.handleSubmit}>
@@ -237,6 +245,7 @@ class NoteForm extends React.Component {
             </Button>
           </Form.Item>
         </Form>
+
         <Modal
             title="Create Tag Editor"
             centered
@@ -244,10 +253,10 @@ class NoteForm extends React.Component {
   /*           onOk={this.handleModalOk} */
             onCancel={this.handleModalCancel}
             footer={[
-              <Button type="danger" onClick={this.handleModalCancel}>
+              <Button type="danger" onClick={ this.handleModalCancel }>
                 Cancel
               </Button>,
-              <Button type="primary" onClick={this.handleAddTag}>
+              <Button type="primary" onClick={ this.handleAddTag }>
                 Create
               </Button>
             ]}
@@ -255,6 +264,7 @@ class NoteForm extends React.Component {
             <Input
               onChange={ this.handleNewTagInput }
               placeholder="Enter New Tag Here"
+              value={ this.state.newTagInput }
             />
         </Modal>
         <Modal
@@ -287,11 +297,19 @@ class NoteForm extends React.Component {
   }
 }
 
+const mapStateToProps = (state) => {
+  return {
+    tags: state.tags,
+  }
+};
+
 const mapDispatchToProps = {
   addNote: addNote,
   increaseId: increaseId,
+  addTag: addTag,
+  removeTag: removeTag,
 };
 
 const WrappedNoteForm = Form.create()(NoteForm)
 
-export default connect(null, mapDispatchToProps)(WrappedNoteForm);
+export default connect(mapStateToProps, mapDispatchToProps)(WrappedNoteForm);

@@ -13,14 +13,8 @@ export const ID_INCREASE = 'ID_INCREASE';
 export const ADD_TAG = 'ADD_TAG';
 export const REMOVE_TAG = 'REMOVE_TAG';
 
-export const SHOW_TAG_ALL = 'SHOW_TAG_ALL'
-export const SHOW_TAG_GENERAL = 'SHOW_TAG_GENERAL'
-export const SHOW_TAG_IMPORTANT = 'SHOW_TAG_IMPORTANT'
-export const SHOW_TAG_OTHER = 'SHOW_TAG_OTHER'
-export const TAG_ALL = 'TAG_ALL'
-export const TAG_GENERAL = 'TAG_GENERAL';
-export const TAG_IMPORTANT = 'TAG_IMPORTANT';
-export const TAG_OTHER = 'TAG_OTHER';
+export const CHANGE_TAG = 'CHANGE_TAG';
+export const TAG_ALL = 'TAG_ALL';
 
 export function addNote(id, title, content, dueDate, tag, createdDate) {
   return {
@@ -65,18 +59,9 @@ export function removeTag(tagName) {
   }
 }
 
-export function showAllTag() {
-  return { type: SHOW_TAG_ALL }
-}
-
-export function showGeneralTag() {
-  return { type: SHOW_TAG_GENERAL }
-}
-
-export function showImportantTag() {
-  return { type: SHOW_TAG_IMPORTANT }
-}
-
-export function showOtherTag() {
-  return { type: SHOW_TAG_OTHER }
+export function showFilterTag(selectedTag) {
+  return {
+    type: CHANGE_TAG,
+    tag: selectedTag,
+  }
 }
