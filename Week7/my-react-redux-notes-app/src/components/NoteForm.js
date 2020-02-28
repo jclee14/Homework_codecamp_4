@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { addNote, increaseId, addTag, removeTag } from '../redux/actions/actions';
+import { addNote, increaseId, addTag, removeTag, addColorBack, removeColor, changeDeletedTag } from '../redux/actions/actions';
 import './NoteForm_List.css';
 import { Form, Button, Input, Icon, Select, DatePicker, Modal, Divider } from 'antd';
 
@@ -23,7 +23,8 @@ class NoteForm extends React.Component {
       addTagModalVisible: false,
       removeTagModalVisible: false,
       newTagInput: '',
-      removedTagSelect: '',
+      newTagColor: undefined,
+      removedTagSelect: undefined,
     }
   }
 
@@ -57,6 +58,12 @@ class NoteForm extends React.Component {
     })
   }
 
+  handleSelectTagColor = (value) => {
+    this.setState({
+      newTagColor: value
+    })
+  }
+
   handleSelectRemoveTag = (value) => {
     this.setState({ removedTagSelect: value });
   }
@@ -64,17 +71,18 @@ class NoteForm extends React.Component {
   handleAddTag = () => {
     this.handleModalCancel();
 
-    const newTagInput = this.state.newTagInput.toUpperCase();  
+    const newTagInput = this.state.newTagInput.toUpperCase();
+    const newTagColor = this.state.newTagColor;
     if(newTagInput) {
       const newTagName = 'TAG_' + newTagInput[0] + newTagInput.substring(1, newTagInput.length);
-      this.props.addTag(newTagName);
+      this.props.addTag(newTagName, newTagColor);
+      this.props.removeColor(newTagColor);
 
-      this.setState({ newTagInput: '' });
-/*       this.setState(prevState => ({
+      this.setState(prevState => ({
         ...prevState,
-        tagItems: [...prevState.tagItems, newTag],
         newTagInput: '',
-      })); */
+        newTagColor: undefined,
+      }));
     }
   };
 
@@ -82,18 +90,18 @@ class NoteForm extends React.Component {
     this.handleModalCancel();
 
     const removeTagSelect = this.state.removedTagSelect.toUpperCase();
+    const tags = this.props.tags;
     if(removeTag) {
       const removeTag = 'TAG_' + removeTagSelect[0] + removeTagSelect.substring(1, removeTagSelect.length);
+      this.props.changeDeletedTag(removeTag);
       this.props.removeTag(removeTag);
+      this.props.addColorBack(
+        tags.filter((tagData) => {
+          return tagData.tagName === removeTag;
+        })[0].tagColor
+      )
 
-      this.setState({ removedTagSelect: '' });
-/*       this.setState(prevState => ({
-        ...prevState,
-        tagItems: prevState.tagItems.filter((tag) => {
-          return tag !== removeTag;
-        }),
-        removedTagSelect: '',
-      })) */
+      this.setState({ removedTagSelect: undefined });
     }
   };
 
@@ -115,7 +123,7 @@ class NoteForm extends React.Component {
         const formalTag = 'TAG_' + tag[0] + tag.substring(1, tag.length);
 
         let localStr = JSON.parse(localStorage.getItem('persist:root'));
-        let id = localStr.id;
+        let id = localStr.nextID;
 
         let timestamp = Date.now();
         let createdDate = new Intl.DateTimeFormat('en-GB', {year: 'numeric', month: '2-digit',day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false}).format(timestamp);
@@ -124,8 +132,8 @@ class NoteForm extends React.Component {
         const values = {
           ...fieldsValue,
           'range-time-picker': [
-            rangeTimeValue[0].format('DD-MM-YYYY HH:mm'),
-            rangeTimeValue[1].format('DD-MM-YYYY HH:mm'),
+            rangeTimeValue[0].format('DD/MM/YYYY, HH:mm'),
+            rangeTimeValue[1].format('DD/MM/YYYY, HH:mm'),
           ]
         };
 
@@ -143,8 +151,9 @@ class NoteForm extends React.Component {
   render() {
     const { getFieldDecorator } = this.props.form;
     const propsTags = this.props.tags;
+    const tagColors = this.props.tagColors;
     const tagItems = propsTags.map((tag) => {
-      return tag.substring(4,tag.length).toLowerCase();
+      return tag.tagName.substring(4,tag.tagName.length).toLowerCase();
     })
     return (
       <div>
@@ -185,7 +194,7 @@ class NoteForm extends React.Component {
 
           <Form.Item label="Due date" className="form-input">
             {getFieldDecorator('range-time-picker', rangeConfig)(
-              <RangePicker style={{ width: "100%"}} showTime format="YYYY-MM-DD HH:mm:ss" />,
+              <RangePicker style={{ width: "100%"}} showTime={{ format: "HH:mm" }} format="YYYY-MM-DD, HH:mm" />,
             )}
           </Form.Item>
 
@@ -217,8 +226,8 @@ class NoteForm extends React.Component {
                   </div>
                 )}
               >
-                {tagItems.map(item => (
-                  <Option key={item}>{item}</Option>
+                {tagItems.map((tag) => (
+                  <Option key={tag}>{tag}</Option>
                 ))}
               </Select>,
             )}
@@ -266,6 +275,16 @@ class NoteForm extends React.Component {
               placeholder="Enter New Tag Here"
               value={ this.state.newTagInput }
             />
+            <Select
+              placeholder="Select color for new tag"
+              onChange={ this.handleSelectTagColor }
+              style={{ width: "100%", marginTop: "10px" }}
+              value={ this.state.newTagColor }
+            >
+              {tagColors.map((color) => (
+                <Option key={color}>{color}</Option>
+              ))}
+            </Select>
         </Modal>
         <Modal
             title="Remove Tag Editor"
@@ -286,6 +305,7 @@ class NoteForm extends React.Component {
                 placeholder="Select tag to remove here"
                 onChange={this.handleSelectRemoveTag}
                 style={{ width: "100%" }}
+                value={ this.state.removedTagSelect }
                 >
                 {tagItems.map((item,index) => (
                   <Option key={item} disabled={index < 3 ? true : false}>{item}</Option>
@@ -300,6 +320,7 @@ class NoteForm extends React.Component {
 const mapStateToProps = (state) => {
   return {
     tags: state.tags,
+    tagColors: state.tagColors,
   }
 };
 
@@ -308,6 +329,9 @@ const mapDispatchToProps = {
   increaseId: increaseId,
   addTag: addTag,
   removeTag: removeTag,
+  addColorBack: addColorBack,
+  removeColor: removeColor,
+  changeDeletedTag: changeDeletedTag,
 };
 
 const WrappedNoteForm = Form.create()(NoteForm)

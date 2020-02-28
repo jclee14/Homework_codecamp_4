@@ -52,9 +52,9 @@ class NotesList extends React.Component {
                   All Tags
                 </Button>
                 {
-                  propsTags.map((tag) => (
-                    <Button type={tagFilter === tag ? "primary" : "dashed"} onClick={ () => this.props.showFilterTag(tag) } >
-                      { tag.substring(4,tag.length).toLowerCase() + ' Tag' }
+                  propsTags.map((tagItem) => (
+                    <Button type={tagFilter === tagItem.tagName ? "primary" : "dashed"} onClick={ () => this.props.showFilterTag(tagItem.tagName) } >
+                      { tagItem.tagName[4] + tagItem.tagName.substring(5,tagItem.tagName.length).toLowerCase() }
                     </Button>
                   ))
                 }

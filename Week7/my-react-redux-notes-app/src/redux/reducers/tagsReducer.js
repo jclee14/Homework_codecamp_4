@@ -1,16 +1,25 @@
 import { ADD_TAG, REMOVE_TAG } from '../actions/actions';
 
-function tagsReducer(tags = ['TAG_GENERAL', 'TAG_IMPORTANT', 'TAG_OTHER'], action) {
+const initialState = [
+  { tagName: 'TAG_GENERAL', tagColor: 'geekblue'},
+  { tagName: 'TAG_IMPORTANT', tagColor: 'orange'},
+  { tagName: 'TAG_OTHER', tagColor: ''}
+]
+
+function tagsReducer(state = initialState, action) {
   switch(action.type) {
     case ADD_TAG:
       return [
-        ...tags,
-        action.tagName
+        ...state,
+        {
+          tagName: action.tagName,
+          tagColor: action.tagColor
+        }
       ];
     case REMOVE_TAG:
-      return tags.filter(tag => tag !== action.tagName);
+      return state.filter(tagData => tagData.tagName !== action.tagName);
     default:
-      return tags;
+      return state;
   }
 }
 

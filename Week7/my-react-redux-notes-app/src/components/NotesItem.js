@@ -9,6 +9,7 @@ class NotesItem extends React.Component {
     let visibility = this.props.visibility;
     let tagFilter = this.props.tagFilter;
     let notes = this.props.notes.filter(note => note.status === visibility);
+    let tagsItem = this.props.tags;
     let filteredNotes;
     if(notes.length > 0) {
       if(tagFilter === TAG_ALL) {
@@ -21,16 +22,22 @@ class NotesItem extends React.Component {
             <Col>
               <ul id="note-list-ul">
                 {filteredNotes.map((note, index) => (
-                  <li key={note.id} style={{ backgroundColor: index % 2 === 0 ? "#f7f7f7" : "white" }}>
+                  <li key={note.id} className="note-list-li" style={{ backgroundColor: index % 2 === 0 ? "#f7f7f7" : "white" }}>
                     <Row>
                       <Col span={4}>
-                        <Tag color={note.tag === "TAG_GENERAL" ? "geekblue" : note.tag === "TAG_IMPORTANT" ? "orange" : "" }>{note.tag === "TAG_GENERAL" ? "general" : note.tag === "TAG_IMPORTANT" ? "important" : "other" }</Tag>
+                        <Tag color={
+                          tagsItem.filter((tagData) => {
+                            return tagData.tagName === note.tag;
+                          })[0].tagColor} /* Get tag color by compare with tag database */
+                        >
+                          { note.tag.substring(4,note.tag.length).toLowerCase() }
+                        </Tag>
                       </Col>
                       <Col span={16}>
                         <h3>{note.title}</h3>
                         <p>{note.content}</p>  
                         <hr />    
-                        <span>Due: {note.dueDate[0]} - {note.dueDate[1]}</span>
+                        <span>Due: {note.dueDate[0]} to {note.dueDate[1]}</span>
                         <br />
                         <span className="txt-date">created: {note.createdDate}</span>
                       </Col>
@@ -60,7 +67,8 @@ const mapStateToProps = (state) => {
   return {
     notes: state.notes,
     visibility: state.visibility,
-    tagFilter: state.tagFilter
+    tagFilter: state.tagFilter,
+    tags: state.tags,
   }
 }
 
