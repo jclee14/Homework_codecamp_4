@@ -3,10 +3,12 @@ import { connect } from 'react-redux';
 import { addNote, increaseId, addTag, removeTag, addColorBack, removeColor, changeDeletedTag } from '../redux/actions/actions';
 import './NoteForm_List.css';
 import { Form, Button, Input, Icon, Select, DatePicker, Modal, Divider } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 const { TextArea } = Input;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
+const { confirm } = Modal;
 
 const rangeConfig = {
   rules: [{ type: 'array', required: true, message: 'Please select time!' }],
@@ -70,46 +72,89 @@ class NoteForm extends React.Component {
 
   handleAddTag = () => {
     this.handleModalCancel();
+    
+    const newTagInput = this.state.newTagInput;
+    let newTagColor = this.state.newTagColor;
+    const { addTag, removeColor } = this.props;
 
-    const newTagInput = this.state.newTagInput.toUpperCase();
-    const newTagColor = this.state.newTagColor;
     if(newTagInput) {
-      const newTagName = 'TAG_' + newTagInput[0] + newTagInput.substring(1, newTagInput.length);
-      this.props.addTag(newTagName, newTagColor);
-      this.props.removeColor(newTagColor);
-
-      this.setState(prevState => ({
-        ...prevState,
-        newTagInput: '',
-        newTagColor: undefined,
-      }));
+      confirm({
+        title: 'Do you want to create this tag?',
+        icon: <ExclamationCircleOutlined />,
+        content: 'tag: ' + newTagInput,
+        centered: true,
+        onOk() {
+          if(!newTagColor) {
+            newTagColor = 'none';
+          }
+          const newTagName = 'TAG_' + newTagInput.toUpperCase();
+          addTag(newTagName, newTagColor);
+          removeColor(newTagColor);
+        },
+        onCancel() {
+          console.log('Cancel');
+        },
+      });
+    } else {
+      Modal.error({
+        title: 'Error:',
+        content: 'Please Enter Tag Name to Create',
+        centered: true,
+      });
     }
+
+    this.setState(prevState => ({
+      ...prevState,
+      newTagInput: '',
+      newTagColor: undefined,
+    }));
   };
 
   handleRemoveTag = () => {
     this.handleModalCancel();
 
-    const removeTagSelect = this.state.removedTagSelect.toUpperCase();
+    const removeTagSelect = this.state.removedTagSelect;
     const tags = this.props.tags;
-    if(removeTag) {
-      const removeTag = 'TAG_' + removeTagSelect[0] + removeTagSelect.substring(1, removeTagSelect.length);
-      this.props.changeDeletedTag(removeTag);
-      this.props.removeTag(removeTag);
-      this.props.addColorBack(
-        tags.filter((tagData) => {
-          return tagData.tagName === removeTag;
-        })[0].tagColor
-      )
-
-      this.setState({ removedTagSelect: undefined });
+    const { changeDeletedTag, removeTag, addColorBack } = this.props;
+    if(removeTagSelect) {
+      confirm({
+        title: 'Do you want to delete this tag?',
+        icon: <ExclamationCircleOutlined />,
+        content: 'tag: ' + removeTagSelect,
+        centered: true,
+        onOk() {
+          const removeTagName = 'TAG_' + removeTagSelect.toUpperCase();
+          changeDeletedTag(removeTagName);
+          removeTag(removeTagName);
+          addColorBack(
+            tags.filter((tagData) => {
+              return tagData.tagName === removeTagName;
+            })[0].tagColor
+          )
+        },
+        onCancel() {
+          console.log('Cancel');
+        },
+      });
+    } else {
+      Modal.error({
+        title: 'Error:',
+        content: 'Please Select Tag  to Delete',
+        centered: true,
+      });
     }
+    this.setState({ removedTagSelect: undefined });
   };
 
   handleModalCancel = () => {
-    this.setState({
+    this.setState(prevState => ({
+      ...prevState,
       addTagModalVisible: false,
       removeTagModalVisible: false,
-    });
+      newTagInput: '',
+      newTagColor: undefined,
+      removedTagSelect: undefined,
+    }));
   };
 
   handleSubmit = (e) => {
@@ -119,8 +164,8 @@ class NoteForm extends React.Component {
       if (!err) {
         let title = this.state.title;
         let content = this.state.content;
-        let tag = this.state.tag.toUpperCase();
-        const formalTag = 'TAG_' + tag[0] + tag.substring(1, tag.length);
+        //let tag = this.state.tag.toUpperCase();
+        const formalTag = this.state.tag.map(tag => 'TAG_' + tag.toUpperCase());
 
         let localStr = JSON.parse(localStorage.getItem('persist:root'));
         let id = localStr.nextID;
@@ -138,7 +183,7 @@ class NoteForm extends React.Component {
         };
 
         const dueDate = values['range-time-picker'];
-
+        
         this.props.addNote(id, title, content, dueDate, formalTag, createdDate);
         this.props.increaseId();
     
@@ -194,7 +239,7 @@ class NoteForm extends React.Component {
 
           <Form.Item label="Due date" className="form-input">
             {getFieldDecorator('range-time-picker', rangeConfig)(
-              <RangePicker style={{ width: "100%"}} showTime={{ format: "HH:mm" }} format="YYYY-MM-DD, HH:mm" />,
+              <RangePicker style={{ width: "100%"}} showTime={{ format: "HH:mm" }} format="DD/MM/YYYY, HH:mm" />,
             )}
           </Form.Item>
 
@@ -203,6 +248,7 @@ class NoteForm extends React.Component {
               rules: [{ required: true, message: 'Please select your tag!' }],
             })(
               <Select
+                mode="multiple"
                 placeholder="Select / Edit Tags"
                 onChange={this.handleSelectChange}
                 dropdownRender={menu => (

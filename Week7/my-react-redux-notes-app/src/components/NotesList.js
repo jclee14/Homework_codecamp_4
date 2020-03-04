@@ -1,33 +1,38 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { showActive, showInActive, showFilterTag } from '../redux/actions/actions';
-import { Button, Row, Col } from 'antd';
+import { Button, Row, Col, Input, Select, Icon } from 'antd';
 import './NoteForm_List.css';
 import NotesItem from './NotesItem';
 import { STATUS_ACTIVE, STATUS_INACTIVE, TAG_ALL } from '../redux/actions/actions'; 
 
 const ButtonGroup = Button.Group;
+const InputGroup = Input.Group;
+const { Option } = Select;
 
 class NotesList extends React.Component {
-/*   constructor(props) {
+  constructor(props) {
     super(props);
 
     this.state = {
-      filterTag: 'TAG_ALL',
+      searchInput: '',
+      searchType: 'title',
     };
   }
 
-  handleShowFilterTag = (selectedTag) => {
-    this.setState({ filterTag: selectedTag });
-  } */
+  handleSearchInput = (event) => {
+    this.setState({ searchInput: event.target.value.toLowerCase() });
+  }
+
+  handleSearchType = (value) => {
+    this.setState({ searchType: value});
+  }
 
   render() {
     let visibility = this.props.visibility;
     let tagFilter = this.props.tagFilter;
     const propsTags = this.props.tags;
-/*     const tagItems = propsTags.map((tag) => {
-      return tag.substring(4,tag.length).toLowerCase();
-    }) */
+
     return (
       <>
           <h2>Notes</h2>
@@ -58,44 +63,30 @@ class NotesList extends React.Component {
                     </Button>
                   ))
                 }
-{/*                 <Button type={tagFilter === TAG_ALL ? "primary" : "dashed"} onClick={ () => this.props.showAllTag()} >
-                  All Tags
-                </Button>
-                <Button type={tagFilter === TAG_GENERAL ? "primary" : "dashed"} onClick={ () => this.props.showGeneralTag()} >
-                  General Tag
-                </Button>
-                <Button type={tagFilter === TAG_IMPORTANT ? "primary" : "dashed"} onClick={ () => this.props.showImportantTag()} >
-                  Important Tag
-                </Button>
-                <Button type={tagFilter === TAG_OTHER ? "primary" : "dashed"} onClick={ () => this.props.showOtherTag()} >
-                  Other Tag
-                </Button> */}
               </ButtonGroup>
             </Col>
           </Row>
-{/*           <Row type="flex">
-            <Col span={6}>
-              <Button type={tagFilter === TAG_ALL ? "primary" : "dashed"} onClick={ () => this.props.showAllTag()} className="form-btn" >
-                All Tags
-              </Button>
+          <br />
+          <Row  type="flex" justify="center">
+            <Col span={20}>
+              <InputGroup compact>
+                <Input
+                  style={{ width: "70%" }}
+                  onChange={ this.handleSearchInput }
+                  placeholder="Search your note here"
+                />
+                <Select
+                  defaultValue="title"
+                  style={{ width: "30%"}}
+                  onChange={ this.handleSearchType }
+                >
+                  <Option value="title"><Icon type="search" /> Title </Option>
+                  <Option value="content"><Icon type="search" /> Content </Option>
+                </Select>
+              </InputGroup>
             </Col>
-            <Col span={6}>
-              <Button type={tagFilter === TAG_GENERAL ? "primary" : "dashed"} onClick={ () => this.props.showGeneralTag()} className="form-btn" >
-                General Tag
-              </Button>
-            </Col>
-            <Col span={6}>
-              <Button type={tagFilter === TAG_IMPORTANT ? "primary" : "dashed"} onClick={ () => this.props.showImportantTag()} className="form-btn" >
-                Important Tag
-              </Button>
-            </Col>
-            <Col span={6}>
-              <Button type={tagFilter === TAG_OTHER ? "primary" : "dashed"} onClick={ () => this.props.showOtherTag()} className="form-btn" >
-                Other Tag
-              </Button>
-            </Col>
-          </Row> */}
-          <NotesItem />
+          </Row>
+          <NotesItem searchInput={ this.state.searchInput } searchType={ this.state.searchType } />
       </>
     )
   }
@@ -113,10 +104,6 @@ const mapDispatchToProps = {
   showActive: showActive,
   showInActive: showInActive,
   showFilterTag: showFilterTag,
-/*   showAllTag: showAllTag,
-  showGeneralTag: showGeneralTag,
-  showImportantTag: showImportantTag,
-  showOtherTag: showOtherTag, */
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(NotesList)

@@ -1,7 +1,9 @@
 //import { uniqueId } from 'lodash';
 
 export const ADD_NOTE = 'ADD_NOTE';
-export const REMOVE_NOTE = 'REMOVE_NOTE';
+export const EDIT_NOTE = 'EDIT_NOTE';
+export const ACTIVE_NOTE = 'ACTIVE_NOTE';
+export const INACTIVE_NOTE = 'INACTIVE_NOTE';
 export const CHANGE_DELETED_TAG = 'CHANGE_DELETED_TAG';
 
 export const STATUS_ACTIVE = 'STATUS_ACTICE';
@@ -34,6 +36,17 @@ export function addNote(id, title, content, dueDate, tag, createdDate) {
   }
 }
 
+export function editNote(id, title, content, dueDate, tag) {
+  return {
+    id: id,
+    type: EDIT_NOTE,
+    title: title,
+    content: content,
+    dueDate: dueDate,
+    tag: tag
+  }
+}
+
 export function changeDeletedTag(tagName) {
   return {
     type: CHANGE_DELETED_TAG,
@@ -41,9 +54,12 @@ export function changeDeletedTag(tagName) {
   }
 }
 
+export function activeNote(id) {
+  return { type: ACTIVE_NOTE, id: id }
+}
 
-export function removeNote(id) {
-  return { type: REMOVE_NOTE, id: id }
+export function inactiveNote(id) {
+  return { type: INACTIVE_NOTE, id: id }
 }
 
 export function showActive() {
