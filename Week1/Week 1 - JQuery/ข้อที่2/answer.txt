@@ -1,0 +1,3 @@
+Question2: $(“ul.product.list”).html(“Product list”) ได้ผลลัพธ์อย่างไร
+
+Answer: tag <ul> ที่มี class="product list" จะถูกแทนที่ด้วยข้อความ "Product list"

@@ -1,0 +1,6 @@
+Question2: ในการพัฒนาตามหลัก Git-flow โดยมีทีม 2 คน ช่วยกันเขียนโค้ด โดยคนนึงเขียน API
+และอีกคนเขียน Frontend เราจะแบ่ง Branch ออกเป็นแบบไหน
+
+Answer: ให้สร้าง develop branch ออกมาจาก master branch ก่อน 
+จากนั้นเราจะแยก feature branch ออกมา 2 สาขา (API และ Frontend feature branch)
+เมื่อพัฒนาเสร็จสิ้น ก็จะ merge เข้ากลับไปยัง develop branch สำหรับการพัฒนาต่อ

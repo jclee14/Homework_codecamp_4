@@ -1,0 +1,3 @@
+Question3: $(“a[target=_blank]”).addClass(“popup-link”) ได้ผลลัพธ์อย่างไร
+
+Answer: jQuery จะ addClass ที่ชื่อว่า "popup-link" ให้กับ tag <a> ที่มี attribute [target=_blank]
