@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lab2</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+<body>
+    <div>
+        <form>
+            <label>Find total between 2 value:</label><br>
+            <input type="text" name="firstNum" value="0"><span> + </span>
+            <input type="text" name="secondNum" value="0"><br>
+        </form>
+        <button>Calculate!</button>
+    </div>
+
+<script>
+    $(document).ready(function(){
+        $("button").click(function(){
+            let number1 = $("input[name='firstNum']").val();
+            let number2 = $("input[name='secondNum']").val();
+            //alert(number2);
+            if(isNaN(number1) || isNaN(number2)) {
+                alert("Please enter integer number only!");
+            } else if(number1 % 1 !== 0 || number2 % 1 !== 0) {
+                alert("Please enter integer number only!");
+            } else if(number1 < 0 || number1 > Math.pow(10,9) || number2 < 0 || number2 > Math.pow(10,9) ) {
+                alert("Please enter integer number between 0 to 10^9");
+            } else {
+                let result = parseInt(number1) + parseInt(number2);
+                alert("The result is " + result);
+            }
+        });
+    });
+</script>
+</body>
+</html>
