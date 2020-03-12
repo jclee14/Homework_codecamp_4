@@ -1,4 +1,2 @@
-var list = ['apple', 'mango', 'banana'];
-
-module.exports = list;
+exports.listModel = ['apple', 'mango', 'banana'];
 

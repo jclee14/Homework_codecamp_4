@@ -1,4 +1,4 @@
-var listModel = require('../model/listModel');
+var {listModel} = require('../model/listModel');
 
 module.exports.getList = function(req, res) {
   var list = listModel;
