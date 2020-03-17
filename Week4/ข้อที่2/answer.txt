@@ -1,0 +1,17 @@
+https://codepen.io/jclee14/pen/YzXLMjV
+
+2.1 console.log แล้วได้ Object ...
+  Object {
+    $$typeof: [object Symbol] {},
+    _owner: null,
+    key: null,
+    props: Object {
+      children: "Hello Homework2!"
+    },
+    ref: null,
+    type: "li"
+  }
+
+  2.2 สั่ง ReactDOM.render ผ่าน rootElement 'ul-element'
+
+  2.3 เปลี่ยน 'div' เป็น 'li'
