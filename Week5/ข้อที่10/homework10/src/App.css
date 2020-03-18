@@ -1,0 +1,57 @@
+.App {
+  background-color: lightgrey;
+  padding: 10px 20px;
+  margin: 10% 25%;
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.feature-header {
+  overflow: hidden;
+}
+
+.feature-list-container {
+  background-color: white;
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0px 1px 2px grey;
+}
+
+h2 {
+  margin: 0;
+  font-size: 20px;
+  float: left;
+}
+
+h4 {
+  margin: 20px 0 0;
+  color: grey;
+}
+
+.hamburgerIcon-container {
+  float: right;
+  cursor: pointer;
+  height: 100%;
+}
+
+.hamburgerIcon {
+  float: left;
+  border-radius: 50%;
+  height: 5px;
+  width: 5px;
+  background: white;
+  display: block;
+  content: '';
+  margin: calc(50% - 2.5px) 2px;
+  background-color: grey;
+}
